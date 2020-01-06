@@ -20,8 +20,7 @@ const {
 const { storagePermission } = require("./rules");
 
 const router = express.Router();
-const spacesEndpoint = new aws.Endpoint(S3_ENDPOINT);
-
+var spacesEndpoint = new AWS.Endpoint(S3_ENDPOINT + ".digitaloceanspaces.com");
 const s3 = new AWS.S3({
   accessKeyId: S3_ACCESS_KEY_ID,
   secretAccessKey: S3_SECRET_ACCESS_KEY,

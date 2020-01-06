@@ -1,6 +1,7 @@
 // HASURA
 exports.HASURA_GRAPHQL_ENDPOINT =
-  process.env.HASURA_GRAPHQL_ENDPOINT || "https://api.skiliks.net/v1/graphql";
+  process.env.HASURA_GRAPHQL_ENDPOINT ||
+  "https://api.skiliks.net/v1/graphql";
 exports.HASURA_GRAPHQL_ADMIN_SECRET =
   process.env.HASURA_GRAPHQL_ADMIN_SECRET || "";
 exports.HASURA_GRAPHQL_JWT_SECRET = process.env.HASURA_GRAPHQL_JWT_SECRET
@@ -77,3 +78,4 @@ exports.S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID || "";
 exports.S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY || "";
 exports.S3_ENDPOINT = process.env.S3_ENDPOINT || "";
 exports.S3_BUCKET = process.env.S3_BUCKET || "";
+
