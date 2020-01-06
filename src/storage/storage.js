@@ -31,6 +31,7 @@ const s3 = new AWS.S3({
 
 const admin_secret_is_ok = req => {
   const { headers } = req;
+  console.log(headers);
   return (
     "x-hasura-admin-secret" in headers &&
     headers["x-hasura-admin-secret"] == HASURA_GRAPHQL_ADMIN_SECRET
