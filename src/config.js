@@ -1,7 +1,7 @@
 // HASURA
 exports.HASURA_GRAPHQL_ENDPOINT =
   process.env.HASURA_GRAPHQL_ENDPOINT ||
-  "http://graphql-engine:8080/v1/graphql";
+  "https://api.skiliks.net/v1/graphql";
 exports.HASURA_GRAPHQL_ADMIN_SECRET =
   process.env.HASURA_GRAPHQL_ADMIN_SECRET || "";
 exports.HASURA_GRAPHQL_JWT_SECRET = process.env.HASURA_GRAPHQL_JWT_SECRET
