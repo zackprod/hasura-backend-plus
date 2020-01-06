@@ -1,12 +1,12 @@
-const express = require('express');
-const Joi = require('joi');
-const Boom = require('@hapi/boom');
-const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
-const mime = require('mime-types');
-const uuidv4 = require('uuid/v4');
+const express = require("express");
+const Joi = require("joi");
+const Boom = require("@hapi/boom");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const AWS = require("aws-sdk");
+const mime = require("mime-types");
+const uuidv4 = require("uuid/v4");
 
 const {
   HASURA_GRAPHQL_JWT_SECRET,
@@ -14,78 +14,76 @@ const {
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
   S3_ENDPOINT,
-  S3_BUCKET,
-} = require('../config');
+  S3_BUCKET
+} = require("../config");
 
-const { storagePermission } = require('./rules');
+const { storagePermission } = require("./rules");
 
 const router = express.Router();
+const spacesEndpoint = new aws.Endpoint(S3_ENDPOINT);
 
-const s3  = new AWS.S3({
+const s3 = new AWS.S3({
   accessKeyId: S3_ACCESS_KEY_ID,
   secretAccessKey: S3_SECRET_ACCESS_KEY,
-  endpoint: S3_ENDPOINT,
+  endpoint: spacesEndpoint,
   s3ForcePathStyle: true,
-  signatureVersion: 'v4',
+  signatureVersion: "v4"
 });
 
-const admin_secret_is_ok = (req) => {
+const admin_secret_is_ok = req => {
   const { headers } = req;
-  return 'x-hasura-admin-secret' in headers && headers['x-hasura-admin-secret'] == HASURA_GRAPHQL_ADMIN_SECRET;
+  return (
+    "x-hasura-admin-secret" in headers &&
+    headers["x-hasura-admin-secret"] == HASURA_GRAPHQL_ADMIN_SECRET
+  );
 };
 
-const get_claims_from_request = (req) => {
-
+const get_claims_from_request = req => {
   // check possible get param token
 
-  const { authorization = '' } = req.headers;
+  const { authorization = "" } = req.headers;
 
-  if (authorization === '') {
+  if (authorization === "") {
     return null;
   }
 
-  const token = authorization !== '' ? authorization.replace('Bearer ', '') : jwt_token;
+  const token =
+    authorization !== "" ? authorization.replace("Bearer ", "") : jwt_token;
 
   try {
-    const decoded = jwt.verify(
-      token,
-      HASURA_GRAPHQL_JWT_SECRET.key,
-      {
-        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
-      }
-    );
-    return decoded['https://hasura.io/jwt/claims'];
+    const decoded = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET.key, {
+      algorithms: HASURA_GRAPHQL_JWT_SECRET.type
+    });
+    return decoded["https://hasura.io/jwt/claims"];
   } catch (err) {
     console.error(err);
     return void 0;
   }
 };
 
-router.get('/fn/get-download-url/*', (req, res, next) => {
+router.get("/fn/get-download-url/*", (req, res, next) => {
   const key = `${req.params[0]}`;
 
   // if not admin, do JWT checks
   if (!admin_secret_is_ok(req)) {
-
     const claims = get_claims_from_request(req);
 
     if (claims === undefined) {
-      return next(Boom.unauthorized('Incorrect JWT Token'));
+      return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
     // check access of key for jwt token claims
-    if (!storagePermission(key, 'read', claims)) {
-      return next(Boom.unauthorized('You are not allowed to read this file'));
+    if (!storagePermission(key, "read", claims)) {
+      return next(Boom.unauthorized("You are not allowed to read this file"));
     }
   }
 
   const params = {
     Bucket: S3_BUCKET,
-    Key: key,
+    Key: key
   };
 
-  s3.headObject(params, async function (err, data) {
-
+  s3.headObject(params, async function(err, data) {
     if (err) {
       console.error(err);
       return next(Boom.forbidden());
@@ -94,7 +92,6 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
     let { token } = data.Metadata;
 
     if (!token) {
-
       token = uuidv4();
 
       const bucket_decoded = decodeURIComponent(S3_BUCKET);
@@ -107,71 +104,68 @@ router.get('/fn/get-download-url/*', (req, res, next) => {
         CopySource: encodeURIComponent(`${bucket_decoded}/${key_decoded}`),
         ContentType: data.ContentType,
         Metadata: {
-          token,
+          token
         },
-        MetadataDirective: 'REPLACE',
+        MetadataDirective: "REPLACE"
       };
 
       // no token exists. Add new token
       try {
         var data = await s3.copyObject(params).promise();
       } catch (e) {
-        return next(Boom.badImplementation('Could not generate token'));
+        return next(Boom.badImplementation("Could not generate token"));
       }
     }
 
     return res.send({
-      token,
+      token
     });
   });
 });
 
-router.delete('/file/*', (req, res, next) => {
-
+router.delete("/file/*", (req, res, next) => {
   const key = `${req.params[0]}`;
 
   // if not admin, do JWT checks
   if (!admin_secret_is_ok(req)) {
-
     const claims = get_claims_from_request(req);
 
     if (claims === undefined) {
-      return next(Boom.unauthorized('Incorrect JWT Token'));
+      return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
     // check access of key for jwt token claims
-    if (!storagePermission(key, 'write', claims)) {
-      return next(Boom.unauthorized('You are not allowed to remove this file'));
+    if (!storagePermission(key, "write", claims)) {
+      return next(Boom.unauthorized("You are not allowed to remove this file"));
     }
   }
 
   const params = {
     Bucket: S3_BUCKET,
-    Key: key,
+    Key: key
   };
 
   s3.deleteObject(params, (err, data) => {
     if (err) {
-      console.error(err, err.stack);  // error
-      return next(Boom.badImplementation('could not delete file'));
+      console.error(err, err.stack); // error
+      return next(Boom.badImplementation("could not delete file"));
     }
 
-    res.send('OK');
+    res.send("OK");
   });
 });
 
-router.get('/file/*', (req, res, next) => {
+router.get("/file/*", (req, res, next) => {
   const key = `${req.params[0]}`;
 
   const token = req.query.token;
 
   const params = {
     Bucket: S3_BUCKET,
-    Key: key,
+    Key: key
   };
 
-  s3.headObject(params, function (err, data) {
-
+  s3.headObject(params, function(err, data) {
     if (err) {
       console.error(err);
       return next(Boom.forbidden());
@@ -184,82 +178,77 @@ router.get('/file/*', (req, res, next) => {
     const stream = s3.getObject(params).createReadStream();
 
     // forward errors
-    stream.on('error', function error(err) {
+    stream.on("error", function error(err) {
       console.error(err);
       return next(Boom.badImplementation());
     });
 
     //Add the content type to the response (it's not propagated from the S3 SDK)
-    res.set('Content-Type', data.ContentType);
-    res.set('Content-Length', data.ContentLength);
-    res.set('Last-Modified', data.LastModified);
-    res.set('Content-Disposition', `inline;`);
-    res.set('Cache-Control', 'public, max-age=31557600');
-    res.set('ETag', data.ETag);
+    res.set("Content-Type", data.ContentType);
+    res.set("Content-Length", data.ContentLength);
+    res.set("Last-Modified", data.LastModified);
+    res.set("Content-Disposition", `inline;`);
+    res.set("Cache-Control", "public, max-age=31557600");
+    res.set("ETag", data.ETag);
 
     //Pipe the s3 object to the response
     stream.pipe(res);
   });
 });
 
-
 const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: S3_BUCKET,
     metadata: (req, file, cb) => {
-
       // TODO: Metadata
       // req.headres (metadata)
 
       cb(null, {
-        token: req.token,
+        token: req.token
       });
     },
-    contentType: function (req, file, cb) {
+    contentType: function(req, file, cb) {
       cb(null, file.mimetype);
     },
-    key: function (req, file, cb) {
-
+    key: function(req, file, cb) {
       // generate unique file names to be saved on the server
       const extension = mime.extension(file.mimetype);
 
       req.saved_file = {
-        originalname  : file.originalname,
+        originalname: file.originalname,
         mimetype: file.mimetype,
         encoding: file.encoding,
         key: `${req.file_path}`,
         extension,
-        token: req.token,
+        token: req.token
       };
 
       cb(null, req.file_path);
-    },
-  }),
+    }
+  })
 });
 
 const upload_auth = (req, res, next) => {
-
   // path to where the file will be uploaded to
   try {
-    req.file_path = req.headers['x-path']
-    .replace(/^\/+/g, '') // remove /
-    .replace(/^ +/g, ' '); // replace multiple (and single) spaces to single space.
+    req.file_path = req.headers["x-path"]
+      .replace(/^\/+/g, "") // remove /
+      .replace(/^ +/g, " "); // replace multiple (and single) spaces to single space.
   } catch (e) {
-    return next(Boom.badImplementation('x-path header incorrect'));
+    return next(Boom.badImplementation("x-path header incorrect"));
   }
 
   // if not admin, do JWT checks
   if (!admin_secret_is_ok(req)) {
-
     const claims = get_claims_from_request(req);
 
     if (claims === undefined) {
-      return next(Boom.unauthorized('Incorrect JWT Token'));
+      return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
-    if (!storagePermission(req.file_path, 'write', claims)) {
-      return next(Boom.unauthorized('You are not allowed to write files here'));
+    if (!storagePermission(req.file_path, "write", claims)) {
+      return next(Boom.unauthorized("You are not allowed to write files here"));
     }
   }
 
@@ -271,7 +260,10 @@ const upload_auth = (req, res, next) => {
   next();
 };
 
-router.post('/upload', upload_auth, upload.array('file', 1), function (req, res) {
+router.post("/upload", upload_auth, upload.array("file", 1), function(
+  req,
+  res
+) {
   res.json(req.saved_file);
 });
 

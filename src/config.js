@@ -1,7 +1,6 @@
 // HASURA
 exports.HASURA_GRAPHQL_ENDPOINT =
-  process.env.HASURA_GRAPHQL_ENDPOINT ||
-  "https://api.skiliks.net/v1/graphql";
+  process.env.HASURA_GRAPHQL_ENDPOINT || "https://api.skiliks.net/v1/graphql";
 exports.HASURA_GRAPHQL_ADMIN_SECRET =
   process.env.HASURA_GRAPHQL_ADMIN_SECRET || "";
 exports.HASURA_GRAPHQL_JWT_SECRET = process.env.HASURA_GRAPHQL_JWT_SECRET
