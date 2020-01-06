@@ -235,6 +235,7 @@ const upload_auth = (req, res, next) => {
       .replace(/^\/+/g, "") // remove /
       .replace(/^ +/g, " "); // replace multiple (and single) spaces to single space.
   } catch (e) {
+    console.log(e);
     return next(Boom.badImplementation("x-path header incorrect"));
   }
 
