@@ -235,7 +235,7 @@ const upload_auth = (req, res, next) => {
     console.log(e);
     return next(Boom.badImplementation("x-path header incorrect"));
   }
-
+  console.log(admin_secret_is_ok(req));
   // if not admin, do JWT checks
   if (!admin_secret_is_ok(req)) {
     const claims = get_claims_from_request(req);
