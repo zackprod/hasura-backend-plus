@@ -189,7 +189,6 @@ router.get("/file/*", (req, res, next) => {
     res.set("Content-Disposition", `inline;`);
     res.set("Cache-Control", "public, max-age=31557600");
     res.set("ETag", data.ETag);
-
     //Pipe the s3 object to the response
     stream.pipe(res);
   });
@@ -202,7 +201,6 @@ const upload = multer({
     metadata: (req, file, cb) => {
       // TODO: Metadata
       // req.headres (metadata)
-
       cb(null, {
         token: req.token
       });
@@ -213,7 +211,6 @@ const upload = multer({
     key: function(req, file, cb) {
       // generate unique file names to be saved on the server
       const extension = mime.extension(file.mimetype);
-
       req.saved_file = {
         originalname: file.originalname,
         mimetype: file.mimetype,
@@ -222,7 +219,6 @@ const upload = multer({
         extension,
         token: req.token
       };
-
       cb(null, req.file_path);
     }
   })
@@ -230,6 +226,7 @@ const upload = multer({
 
 const upload_auth = (req, res, next) => {
   // path to where the file will be uploaded to
+  console.log(req.headers);
   try {
     req.file_path = req.headers["x-path"]
       .replace(/^\/+/g, "") // remove /
