@@ -228,7 +228,7 @@ const upload = multer({
 const upload_auth = (req, res, next) => {
   // path to where the file will be uploaded to
   try {
-    req.file_path = req.headers["x-path"]
+    req.file_path = req.headers["x_path"]
       .replace(/^\/+/g, "") // remove /
       .replace(/^ +/g, " "); // replace multiple (and single) spaces to single space.
   } catch (e) {
