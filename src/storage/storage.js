@@ -31,7 +31,7 @@ const s3 = new AWS.S3({
 
 const admin_secret_is_ok = req => {
   const { headers } = req;
-  console.log(headers);
+
   return (
     "x-hasura-admin-secret" in headers &&
     headers["x-hasura-admin-secret"] == HASURA_GRAPHQL_ADMIN_SECRET
@@ -68,7 +68,7 @@ router.get("/fn/get-download-url/*", (req, res, next) => {
   if (!admin_secret_is_ok(req)) {
     const claims = get_claims_from_request(req);
 
-    if (claims === undefined) {
+    if (claims === null) {
       return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
@@ -130,7 +130,7 @@ router.delete("/file/*", (req, res, next) => {
   if (!admin_secret_is_ok(req)) {
     const claims = get_claims_from_request(req);
 
-    if (claims === undefined) {
+    if (claims === null) {
       return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
@@ -227,7 +227,6 @@ const upload = multer({
 
 const upload_auth = (req, res, next) => {
   // path to where the file will be uploaded to
-  console.log(req.headers);
   try {
     req.file_path = req.headers["x-path"]
       .replace(/^\/+/g, "") // remove /
@@ -236,12 +235,11 @@ const upload_auth = (req, res, next) => {
     console.log(e);
     return next(Boom.badImplementation("x-path header incorrect"));
   }
-  console.log(admin_secret_is_ok(req));
   // if not admin, do JWT checks
   if (!admin_secret_is_ok(req)) {
     const claims = get_claims_from_request(req);
-
-    if (claims === undefined) {
+    console.log(claims);
+    if (claims === null) {
       return next(Boom.unauthorized("Incorrect JWT Token"));
     }
 
