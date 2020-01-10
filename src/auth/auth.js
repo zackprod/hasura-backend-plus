@@ -25,7 +25,13 @@ const schema_name =
     : USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + "_";
 
 router.post("/test_token", async (req, res, next) => {
-  console.log(req.body);
+  let token = req.body.token;
+  try {
+    var decoded = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET);
+    console.log(decoded);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.post("/refresh-token", async (req, res, next) => {
