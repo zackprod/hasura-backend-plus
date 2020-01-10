@@ -1,10 +1,10 @@
-const express = require('express');
-const Joi = require('joi');
-const Boom = require('@hapi/boom');
-const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
-const jwt = require('jsonwebtoken');
-const { graphql_client } = require('../graphql-client');
+const express = require("express");
+const Joi = require("joi");
+const Boom = require("@hapi/boom");
+const bcrypt = require("bcryptjs");
+const uuidv4 = require("uuid/v4");
+const jwt = require("jsonwebtoken");
+const { graphql_client } = require("../graphql-client");
 
 const {
   USER_FIELDS,
@@ -12,20 +12,26 @@ const {
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
-  HASURA_GRAPHQL_JWT_SECRET,
-} = require('../config');
+  HASURA_GRAPHQL_JWT_SECRET
+} = require("../config");
 
-const auth_functions = require('./auth-functions');
+const auth_functions = require("./auth-functions");
 
 let router = express.Router();
 
-const schema_name = USER_MANAGEMENT_DATABASE_SCHEMA_NAME === 'public' ? '' :  USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + '_';
+const schema_name =
+  USER_MANAGEMENT_DATABASE_SCHEMA_NAME === "public"
+    ? ""
+    : USER_MANAGEMENT_DATABASE_SCHEMA_NAME.toString().toLowerCase() + "_";
 
-router.post('/refresh-token', async (req, res, next) => {
+router.post("/test_token", async (req, res, next) => {
+  console.log(req.body);
+});
 
+router.post("/refresh-token", async (req, res, next) => {
   // validate username and password
   const schema = Joi.object().keys({
-    refresh_token: Joi.string().required(),
+    refresh_token: Joi.string().required()
   });
 
   const { error, value } = schema.validate(req.body);
@@ -59,7 +65,7 @@ router.post('/refresh-token', async (req, res, next) => {
         user_roles {
           role
         }
-        ${USER_FIELDS.join('\n')}
+        ${USER_FIELDS.join("\n")}
       }
     }
   }
@@ -69,7 +75,7 @@ router.post('/refresh-token', async (req, res, next) => {
   try {
     hasura_data = await graphql_client.request(query, {
       refresh_token,
-      current_timestampz: new Date(),
+      current_timestampz: new Date()
     });
   } catch (e) {
     console.error(e);
@@ -109,7 +115,9 @@ router.post('/refresh-token', async (req, res, next) => {
 
   const new_refresh_token = uuidv4();
   // convert from minutes to milli seconds
-  const new_refresh_token_expires_at = new Date(new Date().getTime() + (REFRESH_TOKEN_EXPIRES * 60 * 1000));
+  const new_refresh_token_expires_at = new Date(
+    new Date().getTime() + REFRESH_TOKEN_EXPIRES * 60 * 1000
+  );
 
   try {
     await graphql_client.request(query, {
@@ -117,8 +125,8 @@ router.post('/refresh-token', async (req, res, next) => {
       new_refresh_token_data: {
         user_id: user.id,
         refresh_token: new_refresh_token,
-        expires_at: new_refresh_token_expires_at,
-      },
+        expires_at: new_refresh_token_expires_at
+      }
     });
   } catch (e) {
     console.error(e);
@@ -131,14 +139,14 @@ router.post('/refresh-token', async (req, res, next) => {
 
   res.json({
     refresh_token: new_refresh_token,
-    jwt_token,
+    jwt_token
   });
 });
 
-router.post('/logout', async (req, res, next) => {
+router.post("/logout", async (req, res, next) => {
   // get refresh token
   const schema = Joi.object().keys({
-    refresh_token: Joi.string().uuid(),
+    refresh_token: Joi.string().uuid()
   });
 
   const { error, value } = schema.validate(req.body);
@@ -163,21 +171,22 @@ router.post('/logout', async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(mutation, {
-      refresh_token: refresh_token,
+      refresh_token: refresh_token
     });
   } catch (e) {
     console.error(e);
     // let this error pass. Just log out the user by sending https status code 200 back
   }
 
-  res.send('OK');
+  res.send("OK");
 });
 
-router.post('/logout-all', async (req, res, next) => {
-
+router.post("/logout-all", async (req, res, next) => {
   // get refresh token
   const schema = Joi.object().keys({
-    refresh_token: Joi.string().uuid().required(),
+    refresh_token: Joi.string()
+      .uuid()
+      .required()
   });
 
   const { error, value } = schema.validate(req.body);
@@ -209,7 +218,7 @@ router.post('/logout-all', async (req, res, next) => {
   try {
     hasura_data = await graphql_client.request(query, {
       refresh_token,
-      current_timestampz: new Date(),
+      current_timestampz: new Date()
     });
   } catch (e) {
     console.error(e);
@@ -235,22 +244,24 @@ router.post('/logout-all', async (req, res, next) => {
 
   try {
     hasura_data = await graphql_client.request(mutation, {
-      user_id: user.id,
+      user_id: user.id
     });
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized('Unable to delete refresh tokens'));
+    return next(Boom.unauthorized("Unable to delete refresh tokens"));
   }
 
-  res.send('OK');
+  res.send("OK");
 });
 
-router.post('/activate-account', async (req, res, next) => {
+router.post("/activate-account", async (req, res, next) => {
   let hasura_data;
 
   const schema = Joi.object().keys({
-    secret_token: Joi.string().uuid({version: ['uuidv4']}).required(),
+    secret_token: Joi.string()
+      .uuid({ version: ["uuidv4"] })
+      .required()
   });
 
   const { error, value } = schema.validate(req.body);
@@ -259,9 +270,7 @@ router.post('/activate-account', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const {
-    secret_token,
-  } = value;
+  const { secret_token } = value;
 
   const query = `
   mutation activate_account (
@@ -295,32 +304,35 @@ router.post('/activate-account', async (req, res, next) => {
     hasura_data = await graphql_client.request(query, {
       secret_token,
       new_secret_token: uuidv4(),
-      now: new Date(),
+      now: new Date()
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Unable to find account for activation.'));
+    return next(Boom.unauthorized("Unable to find account for activation."));
   }
 
   if (hasura_data[`update_users`].affected_rows === 0) {
     // console.error('Account already activated');
-    return next(Boom.unauthorized('Account is already activated, the secret token has expired or there is no account.'));
+    return next(
+      Boom.unauthorized(
+        "Account is already activated, the secret token has expired or there is no account."
+      )
+    );
   }
 
-  res.send('OK');
+  res.send("OK");
 });
 
-router.get('/user', async (req, res, next) => {
-
+router.get("/user", async (req, res, next) => {
   // get jwt token
   if (!req.headers.authorization) {
-    return next(Boom.badRequest('no authorization header'));
+    return next(Boom.badRequest("no authorization header"));
   }
 
-  const auth_split = req.headers.authorization.split(' ');
+  const auth_split = req.headers.authorization.split(" ");
 
-  if (auth_split[0] !== 'Bearer' || !auth_split[1]) {
-    return next(Boom.badRequest('malformed authorization header'));
+  if (auth_split[0] !== "Bearer" || !auth_split[1]) {
+    return next(Boom.badRequest("malformed authorization header"));
   }
 
   // get jwt token
@@ -329,20 +341,16 @@ router.get('/user', async (req, res, next) => {
   // verify jwt token is OK
   let claims;
   try {
-    claims = jwt.verify(
-      token,
-      HASURA_GRAPHQL_JWT_SECRET.key,
-      {
-        algorithms: HASURA_GRAPHQL_JWT_SECRET.type,
-      }
-    );
+    claims = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET.key, {
+      algorithms: HASURA_GRAPHQL_JWT_SECRET.type
+    });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized('Incorrect JWT Token'));
+    return next(Boom.unauthorized("Incorrect JWT Token"));
   }
 
   // get user_id from jwt claim
-  const user_id = claims['https://hasura.io/jwt/claims']['x-hasura-user-id'];
+  const user_id = claims["https://hasura.io/jwt/claims"]["x-hasura-user-id"];
 
   // get user from hasura (include ${USER_FIELDS.join('\n')})
   let query = `
@@ -359,7 +367,7 @@ router.get('/user', async (req, res, next) => {
       roles: user_roles {
         role
       }
-      ${USER_FIELDS.join('\n')}
+      ${USER_FIELDS.join("\n")}
     }
   }
   `;
@@ -367,7 +375,7 @@ router.get('/user', async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
-      id: user_id,
+      id: user_id
     });
   } catch (e) {
     console.error(e);
@@ -376,10 +384,8 @@ router.get('/user', async (req, res, next) => {
 
   // return user as json response
   res.json({
-    user: hasura_data.user,
+    user: hasura_data.user
   });
 });
-
-
 
 module.exports = router;
