@@ -27,7 +27,7 @@ const schema_name =
 router.post("/test_token", async (req, res, next) => {
   let token = req.body.token;
   try {
-    var decoded = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET);
+    var decoded = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET.key);
     console.log(decoded);
   } catch (error) {
     console.log(error);
