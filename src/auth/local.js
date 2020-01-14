@@ -197,7 +197,7 @@ router.post("/login", async (req, res, next) => {
 
   let query = `
   query (
-    $username: String!
+    $email: String!
   ) {
     user_accounts: ${schema_name}user_accounts (
       where: {
