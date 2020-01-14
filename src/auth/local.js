@@ -182,7 +182,7 @@ router.post("/new-password", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   // validate username and password
   const schema = Joi.object().keys({
-    username: Joi.string().required(),
+    email: Joi.string().required(),
     password: Joi.string().required()
   });
 
@@ -193,7 +193,7 @@ router.post("/login", async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { username, password } = value;
+  const { email, password } = value;
 
   let query = `
   query (
@@ -201,7 +201,7 @@ router.post("/login", async (req, res, next) => {
   ) {
     user_accounts: ${schema_name}user_accounts (
       where: {
-        username: { _eq: $username}
+        email: { _eq: $email}
       }
     ) {
       password
@@ -221,7 +221,7 @@ router.post("/login", async (req, res, next) => {
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
-      username
+      email
     });
   } catch (e) {
     console.error(e);
