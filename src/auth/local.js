@@ -218,6 +218,8 @@ router.post("/login", async (req, res, next) => {
   }
   `;
 
+  console.log(query);
+  console.log(email);
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
