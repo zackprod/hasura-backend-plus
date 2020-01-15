@@ -86,12 +86,12 @@ router.post("/refresh-token", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    return next(Boom.badRequest("Invalid 'refresh_token'"));
   }
 
   if (hasura_data[`refresh_tokens`].length === 0) {
     // console.error('Incorrect user id or refresh token');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    return next(Boom.badRequest("Invalid 'refresh_token'"));
   }
 
   const user = hasura_data[`refresh_tokens`][0].user;
@@ -137,7 +137,7 @@ router.post("/refresh-token", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('unable to create new refresh token and delete old');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    return next(Boom.badRequest("Invalid 'refresh_token'"));
   }
 
   // generate new jwt token
@@ -229,7 +229,7 @@ router.post("/logout-all", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Invalid 'refresh_token'"));
+    return next(Boom.badRequest("Invalid 'refresh_token'"));
   }
   const { user } = hasura_data.refresh_tokens[0];
 
@@ -255,7 +255,7 @@ router.post("/logout-all", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.unauthorized("Unable to delete refresh tokens"));
+    return next(Boom.badRequest("Unable to delete refresh tokens"));
   }
 
   res.send("OK");
@@ -314,13 +314,13 @@ router.post("/activate-account", async (req, res, next) => {
     });
   } catch (e) {
     console.error(e);
-    return next(Boom.unauthorized("Unable to find account for activation."));
+    return next(Boom.badRequest("Unable to find account for activation."));
   }
 
   if (hasura_data[`update_users`].affected_rows === 0) {
     // console.error('Account already activated');
     return next(
-      Boom.unauthorized(
+      Boom.badRequest(
         "Account is already activated, the secret token has expired or there is no account."
       )
     );
