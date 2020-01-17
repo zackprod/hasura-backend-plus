@@ -82,3 +82,4 @@ exports.SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "";
 exports.FromEmail = process.env.FromEmail || "";
 exports.access_token_expires_mail = process.env.access_token_expires_mail || "";
 exports.redirect_url = process.env.redirect_url || "";
+exports.subject = process.env.subject || "";
