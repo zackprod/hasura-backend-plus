@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const uuidv4 = require("uuid/v4");
 const jwt = require("jsonwebtoken");
 const { graphql_client } = require("../graphql-client");
+const User = require("./mail/user");
 
 const {
   USER_FIELDS,
@@ -12,7 +13,12 @@ const {
   USER_MANAGEMENT_DATABASE_SCHEMA_NAME,
   REFRESH_TOKEN_EXPIRES,
   JWT_TOKEN_EXPIRES,
-  HASURA_GRAPHQL_JWT_SECRET
+  HASURA_GRAPHQL_JWT_SECRET,
+  redirect_url,
+  FromEmail,
+  subject,
+  publicip,
+  access_token_expires_mail
 } = require("../config");
 
 const auth_functions = require("./auth-functions");
@@ -229,7 +235,7 @@ router.post("/logout-all", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.badRequest("Invalid 'refresh_token'"));
+    return next(Boom.unauthorized("Invalid 'refresh_token'"));
   }
   const { user } = hasura_data.refresh_tokens[0];
 
@@ -255,10 +261,83 @@ router.post("/logout-all", async (req, res, next) => {
   } catch (e) {
     console.error(e);
     // console.error('Error connection to GraphQL');
-    return next(Boom.badRequest("Unable to delete refresh tokens"));
+    return next(Boom.unauthorized("Unable to delete refresh tokens"));
   }
 
   res.send("OK");
+});
+
+function signToken(payload) {
+  var token = jwt.sign(payload, HASURA_GRAPHQL_JWT_SECRET.key, {
+    algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
+    expiresIn: `${access_token_expires_mail}m`
+  });
+  return token;
+}
+
+function verifyToken(token) {
+  var verify = jwt.verify(token, HASURA_GRAPHQL_JWT_SECRET.key, {
+    algorithms: HASURA_GRAPHQL_JWT_SECRET.type
+  });
+  return verify;
+}
+
+async function main(username, email) {
+  try {
+    let id = await User.updateSecretTokenExpires(username, email);
+
+    let data = { id: id };
+    let token = await signToken(data);
+    let path = `https://auth.skiliks.net/auth/validateAccount?Br=${token}`;
+    let html = await require("./mail/html")(path);
+    const msg = {
+      to: email,
+      from: FromEmail,
+      subject: subject,
+      text: "Welcome Mr" + username,
+      html: html
+    };
+    axios
+      .post("http://68.183.67.65:5551/mailing", {
+        msg: msg
+      })
+      .then(function(response) {
+        // handle success
+        console.log(response.datap);
+      })
+      .catch(function(error) {
+        // handle error
+        console.log(error);
+      });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+router.post("/init-activate-account", async (req, res, next) => {
+  let email = req.body.email;
+  let username = req.body.username;
+
+  main(username, email);
+});
+
+router.get("/validateAccount", async (req, res, next) => {
+  try {
+    if (req.query.Br) {
+      let token = req.query.Br;
+      let verify = await verifyToken(token);
+      let result = await User.activateAccount(verify.id);
+      if (result != null) {
+        res.redirect(redirect_url);
+      } else {
+        console.log(result);
+        res.status(404).send("404 Invalid Request");
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).send("404 Invalid Request");
+  }
 });
 
 router.post("/activate-account", async (req, res, next) => {
@@ -273,7 +352,7 @@ router.post("/activate-account", async (req, res, next) => {
   const { error, value } = schema.validate(req.body);
 
   if (error) {
-    return next(Boom.badRequest(error.details[0].message));
+    return next(Boom.unauthorized(error.details[0].message));
   }
 
   const { secret_token } = value;
