@@ -5,7 +5,7 @@ const {
   HASURA_GRAPHQL_ENDPOINT,
   HASURA_GRAPHQL_ADMIN_SECRET,
   access_token_expires_mail
-} = require("../..config");
+} = require("../../config");
 
 module.exports = class user {
   static staticgetcurrentdate() {
