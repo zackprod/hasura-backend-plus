@@ -319,7 +319,7 @@ router.post("/init-activate-account", async (req, res, next) => {
   let username = req.body.username;
 
   main(username, email);
-  res.send(1);
+  res.json({ status: 1 });
 });
 
 router.get("/validateAccount", async (req, res, next) => {
