@@ -18,7 +18,6 @@ const {
   redirect_url,
   FromEmail,
   subject,
-  publicip,
   access_token_expires_mail
 } = require("../config");
 
