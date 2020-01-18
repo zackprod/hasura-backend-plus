@@ -319,6 +319,7 @@ router.post("/init-activate-account", async (req, res, next) => {
   let username = req.body.username;
 
   main(username, email);
+  res.send(1);
 });
 
 router.get("/validateAccount", async (req, res, next) => {
@@ -328,6 +329,8 @@ router.get("/validateAccount", async (req, res, next) => {
       let verify = await verifyToken(token);
       console.log(verify);
       let result = await User.activateAccount(verify.id);
+
+      console.log(result);
       if (result != null) {
         res.redirect(redirect_url);
       } else {
@@ -337,7 +340,7 @@ router.get("/validateAccount", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(404).send("404 Invalid Request");
+    res.status(404).send("405  Invalid Request");
   }
 });
 
