@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY pm2.json .
-COPY src src
+COPY . .
 
 ADD . .
 
