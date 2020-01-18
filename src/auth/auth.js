@@ -6,6 +6,7 @@ const uuidv4 = require("uuid/v4");
 const jwt = require("jsonwebtoken");
 const { graphql_client } = require("../graphql-client");
 const User = require("./mail/user");
+const axios = require("axios");
 
 const {
   USER_FIELDS,
