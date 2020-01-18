@@ -340,7 +340,7 @@ router.get("/validateAccount", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(404).send("405  Invalid Request");
+    res.status(404).send("405 Invalid Request");
   }
 });
 

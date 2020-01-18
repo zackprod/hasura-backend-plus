@@ -101,12 +101,15 @@ module.exports = class user {
             secret_token: secret_token
           }
         );
+        console.log(data);
         if (data.data.statusCode) return null;
         return data;
       } else {
         return null;
       }
     } catch (error) {
+      console.log(error);
+
       return null;
     }
   }
