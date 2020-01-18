@@ -290,6 +290,7 @@ async function main(username, email) {
     let token = await signToken(data);
     let path = `https://auth.skiliks.net/auth/validateAccount?Br=${token}`;
     let html = await require("./mail/html")(path);
+    console.log(path);
     const msg = {
       to: email,
       from: FromEmail,

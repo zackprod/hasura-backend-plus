@@ -101,7 +101,7 @@ module.exports = class user {
             secret_token: secret_token
           }
         );
-        console.log(data);
+        console.log(data.data);
         if (data.data.statusCode) return null;
         return data;
       } else {
