@@ -326,6 +326,7 @@ router.get("/validateAccount", async (req, res, next) => {
     if (req.query.Br) {
       let token = req.query.Br;
       let verify = await verifyToken(token);
+      console.log(verify);
       let result = await User.activateAccount(verify.id);
       if (result != null) {
         res.redirect(redirect_url);
