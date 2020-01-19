@@ -290,7 +290,6 @@ async function main(username, email) {
     let token = await signToken(data);
     let path = `https://auth.skiliks.net/auth/validateAccount?Br=${token}`;
     let html = await require("./mail/html")(path);
-    console.log(path);
     const msg = {
       to: email,
       from: FromEmail,
@@ -331,7 +330,7 @@ router.get("/validateAccount", async (req, res, next) => {
       console.log(verify);
       let result = await User.activateAccount(verify.id);
 
-      console.log(result);
+      console.log(redirect_url);
       if (result != null) {
         res.redirect(redirect_url);
       } else {
