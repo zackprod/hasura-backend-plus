@@ -335,7 +335,7 @@ router.get("/validateAccount", async (req, res, next) => {
         res.redirect(redirect_url);
       } else {
         console.log(result);
-        res.status(404).send("404 Invalid Request");
+        res.redirect(redirect_url);
       }
     }
   } catch (error) {
