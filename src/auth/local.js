@@ -84,7 +84,7 @@ router.post("/register", async (req, res, next) => {
         }
       }
     });
-    console.log(response.data);
+    console.log(response);
   } catch (e) {
     console.error(e);
     return next(Boom.badImplementation("Unable to create user."));
