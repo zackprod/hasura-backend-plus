@@ -50,7 +50,6 @@ router.post("/register", async (req, res, next) => {
     timezone,
     language
   } = value;
-  console.log(timezone, language);
   // create user account
   const mutation = `
   mutation (
@@ -60,14 +59,16 @@ router.post("/register", async (req, res, next) => {
       objects: [$user]
     ) {
       affected_rows
+      returning {
+        id
+      }
     }
   }
   `;
-  console.log(mutation);
 
   // create user and user_account in same mutation
   try {
-    await graphql_client.request(mutation, {
+    let response = await graphql_client.request(mutation, {
       user: {
         display_name: username,
         email: email,
@@ -83,6 +84,7 @@ router.post("/register", async (req, res, next) => {
         }
       }
     });
+    console.log(response.data);
   } catch (e) {
     console.error(e);
     return next(Boom.badImplementation("Unable to create user."));
