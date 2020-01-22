@@ -31,7 +31,9 @@ router.post("/register", async (req, res, next) => {
     email: Joi.string().email(),
     username: Joi.string().required(),
     password: Joi.string().required(),
-    register_data: Joi.object().allow(null)
+    register_data: Joi.object().allow(null),
+    timezone: Joi.number().required(),
+    language: Joi.number().required()
   });
 
   const { error, value } = schema.validate(req.body);
@@ -40,8 +42,15 @@ router.post("/register", async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message));
   }
 
-  const { email, username, password, register_data } = value;
-
+  const {
+    email,
+    username,
+    password,
+    register_data,
+    timezone,
+    language
+  } = value;
+  console.log(timezone, language);
   // create user account
   const mutation = `
   mutation (
