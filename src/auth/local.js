@@ -63,6 +63,7 @@ router.post("/register", async (req, res, next) => {
     }
   }
   `;
+  console.log(mutation);
 
   // create user and user_account in same mutation
   try {
