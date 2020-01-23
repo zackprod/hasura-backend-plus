@@ -84,7 +84,7 @@ router.post("/register", async (req, res, next) => {
         }
       }
     });
-    console.log(response.insert_users && response.insert_users.returning[0]);
+    console.log(response.insert_users.returning[0]);
     if (response.insert_users && response.insert_users.returning[0].id) {
       let mutationAccountSetting = `mutation MyMutation {
         __typename
@@ -93,7 +93,8 @@ router.post("/register", async (req, res, next) => {
         }
       }
       `;
-      await graphql_client.request(mutation);
+      await graphql_client.request(mutationAccountSetting);
+      console.log(mutationAccountSetting);
     }
   } catch (e) {
     console.error(e);
