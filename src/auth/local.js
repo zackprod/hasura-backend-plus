@@ -85,14 +85,29 @@ router.post("/register", async (req, res, next) => {
       }
     });
     if (response.insert_users && response.insert_users.returning[0].id) {
-      let mutationAccountSetting = `mutation MyMutation {
+      let mutationGetId_TimeZone_Language = `query MyQuery {
+    dictionary(where: {name: {_like: "${timezone}"}, type: {_eq: "TIMEZONE"}}) {
+      id
+    }
+    dictionary_i18n(where: {label: {_like: "%${language}%"}}) {
+      id
+    }
+  }
+  `;
+      let response1 = await graphql_client.request(
+        mutationGetId_TimeZone_Language
+      );
+
+      console.log(response1);
+
+      /* let mutationAccountSetting = `mutation MyMutation {
         __typename
         insert_account_setting(objects: {language_code: ${language}, timezone_code: ${timezone}, user_id: "${response.insert_users.returning[0].id}"}) {
           affected_rows
         }
       }
       `;
-      await graphql_client.request(mutationAccountSetting);
+      await graphql_client.request(mutationAccountSetting);*/
     }
   } catch (e) {
     console.error(e);
