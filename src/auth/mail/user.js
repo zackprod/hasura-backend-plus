@@ -57,7 +57,7 @@ module.exports = class user {
       return null;
     }
   }
-  static async updateSecretTokenExpires(display_name, email) {
+  static async updateSecretTokenExpires(email) {
     let response = await fetch(HASURA_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {

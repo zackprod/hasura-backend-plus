@@ -284,7 +284,7 @@ function verifyToken(token) {
 
 async function main(username, email) {
   try {
-    let id = await User.updateSecretTokenExpires(username, email);
+    let id = await User.updateSecretTokenExpires(email);
 
     let data = { id: id };
     let token = await signToken(data);
@@ -294,7 +294,7 @@ async function main(username, email) {
       to: email,
       from: FromEmail,
       subject: subject,
-      text: "Welcome Mr" + username,
+      text: "Welcome " + username,
       html: html
     };
     axios
