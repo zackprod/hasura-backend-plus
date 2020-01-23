@@ -85,6 +85,16 @@ router.post("/register", async (req, res, next) => {
       }
     });
     console.log(response);
+    if (response.insert_users && response.insert_users.returning[0].id) {
+      let mutationAccountSetting = `mutation MyMutation {
+        __typename
+        insert_account_setting(objects: {language_code: ${language}, timezone_code: ${timezone}, user_id: "${response.insert_users.returning[0].id}"}) {
+          affected_rows
+        }
+      }
+      `;
+      await graphql_client.request(mutation);
+    }
   } catch (e) {
     console.error(e);
     return next(Boom.badImplementation("Unable to create user."));
