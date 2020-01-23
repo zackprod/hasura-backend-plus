@@ -32,8 +32,8 @@ router.post("/register", async (req, res, next) => {
     username: Joi.string().required(),
     password: Joi.string().required(),
     register_data: Joi.object().allow(null),
-    timezone: Joi.number().required(),
-    language: Joi.number().required()
+    timezone: Joi.string().required(),
+    language: Joi.string().required()
   });
 
   const { error, value } = schema.validate(req.body);
