@@ -28,8 +28,10 @@ router.post("/register", async (req, res, next) => {
   let password_hash;
 
   const schema = Joi.object().keys({
-    email: Joi.string().email(),
-    username: Joi.string().required(),
+    email: Joi.string()
+      .email()
+      .required(),
+    username: Joi.string().allow(null),
     password: Joi.string().required(),
     register_data: Joi.object().allow(null),
     timezone: Joi.string().required(),
