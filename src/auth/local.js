@@ -129,6 +129,7 @@ router.post("/register", async (req, res, next) => {
 router.post("/new-password", async (req, res, next) => {
   let hasura_data;
   let password_hash;
+  console.log("test");
 
   const schema = Joi.object().keys({
     secret_token: Joi.string()
