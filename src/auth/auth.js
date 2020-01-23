@@ -282,7 +282,7 @@ function verifyToken(token) {
   return verify;
 }
 
-async function main(username, email) {
+async function main(email) {
   try {
     let id = await User.updateSecretTokenExpires(email);
 
@@ -294,7 +294,7 @@ async function main(username, email) {
       to: email,
       from: FromEmail,
       subject: subject,
-      text: "Welcome " + username,
+      text: "Welcome",
       html: html
     };
     axios
@@ -316,9 +316,8 @@ async function main(username, email) {
 
 router.post("/init-activate-account", async (req, res, next) => {
   let email = req.body.email;
-  let username = req.body.username;
 
-  main(username, email);
+  main(email);
   res.json({ status: 1 });
 });
 
