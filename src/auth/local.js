@@ -98,16 +98,23 @@ router.post("/register", async (req, res, next) => {
         mutationGetId_TimeZone_Language
       );
 
-      console.log(response1);
+      if (response1.dictionary && response1.dictionary_i18n) {
+        let timezoneId = response1.dictionary[0].id;
+        let languageId = response1.dictionary_i18n[0].id;
 
-      /* let mutationAccountSetting = `mutation MyMutation {
-        __typename
-        insert_account_setting(objects: {language_code: ${language}, timezone_code: ${timezone}, user_id: "${response.insert_users.returning[0].id}"}) {
-          affected_rows
+        let mutationAccountSetting = `mutation MyMutation {
+          __typename
+          insert_account_setting(objects: {language_code: ${languageId}, timezone_code: ${timezoneId}, user_id: "${response.insert_users.returning[0].id}"}) {
+            affected_rows
+          }
         }
+        `;
+        await graphql_client.request(mutationAccountSetting);
+      } else {
+        return next(Boom.badImplementation("Unable to create user."));
       }
-      `;
-      await graphql_client.request(mutationAccountSetting);*/
+    } else {
+      return next(Boom.badImplementation("Unable to create user."));
     }
   } catch (e) {
     console.error(e);
@@ -254,8 +261,6 @@ router.post("/login", async (req, res, next) => {
   }
   `;
 
-  console.log(query);
-  console.log(email);
   let hasura_data;
   try {
     hasura_data = await graphql_client.request(query, {
