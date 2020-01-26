@@ -1,18 +1,19 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const {
   JWT_TOKEN_EXPIRES,
   HASURA_GRAPHQL_JWT_SECRET,
   STORAGE_JWT_SECRET,
-  USER_FIELDS,
-} = require('../config');
+  USER_FIELDS
+} = require("../config");
 
 module.exports = {
   generateJwtToken: function(user) {
-
     let custom_claims = {};
 
     USER_FIELDS.forEach(user_field => {
-      custom_claims['x-hasura-' + user_field.replace('_', '-')] = user[user_field].toString();
+      custom_claims["x-hasura-" + user_field.replace("_", "-")] = user[
+        user_field
+      ].toString();
     });
 
     const user_roles = user.user_roles.map(role => {
@@ -23,16 +24,20 @@ module.exports = {
       user_roles.push(user.default_role);
     }
 
-    return jwt.sign({
-      'https://hasura.io/jwt/claims': {
-        'x-hasura-allowed-roles': user_roles,
-        'x-hasura-default-role': user.default_role,
-        'x-hasura-user-id': user.id.toString(),
-        ...custom_claims,
+    return jwt.sign(
+      {
+        "https://hasura.io/jwt/claims": {
+          "x-hasura-allowed-roles": user_roles,
+          "x-hasura-default-role": user.default_role,
+          "x-hasura-user-id": user.id.toString(),
+          ...custom_claims
+        }
       },
-    }, HASURA_GRAPHQL_JWT_SECRET.key, {
-      algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
-      expiresIn: `${JWT_TOKEN_EXPIRES}m`,
-    });
-  },
+      HASURA_GRAPHQL_JWT_SECRET.key,
+      {
+        algorithm: HASURA_GRAPHQL_JWT_SECRET.type,
+        expiresIn: `${JWT_TOKEN_EXPIRES}m`
+      }
+    );
+  }
 };

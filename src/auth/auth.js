@@ -336,6 +336,8 @@ router.get("/validateAccount", async (req, res, next) => {
         console.log(result);
         res.redirect(redirect_url);
       }
+    } else {
+      res.status(404).send("405 Invalid Request");
     }
   } catch (error) {
     console.log(error);
@@ -387,6 +389,7 @@ router.post("/activate-account", async (req, res, next) => {
     }
   }
   `;
+  console.log(query);
 
   try {
     hasura_data = await graphql_client.request(query, {
