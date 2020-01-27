@@ -10,22 +10,9 @@ const {
 module.exports = class user {
   static staticgetcurrentdate() {
     let i = access_token_expires_mail;
-    var today = new Date();
-    var date =
-      today.getFullYear() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getDate();
-    var time =
-      today.getHours() +
-      ":" +
-      ((today.getMinutes() + i) % 60) +
-      ":" +
-      today.getSeconds();
-    var dateTime = date + " " + time;
+    var date = new Date();
 
-    return dateTime;
+    return new Date(date.getTime() + minutes * i);
   }
 
   static async getSecretToken(id) {
