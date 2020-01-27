@@ -84,6 +84,7 @@ module.exports = class user {
       })
     });
     console.log(this.staticgetcurrentdate());
+    console.log(new Date());
     const data = await response.json();
     if (data.data.update_users.returning.length > 0) {
       return data.data.update_users.returning[0].id;
