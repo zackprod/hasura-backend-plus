@@ -100,6 +100,8 @@ module.exports = class user {
     });
 
     const data = await response.json();
+    console.log(data.data.users);
+    console.log(data.data.users.length);
     if (data.data.users.length > 0) {
       return data.data.users[0].active;
     } else {
