@@ -326,10 +326,10 @@ router.post("/init-activate-account", async (req, res, next) => {
   const { email } = value;
 
   let result = await User.getStatusUser(email);
-  if (!result) {
+  if (result == 0) {
     main(email);
     res.json({ status: 0 });
-  } else if (result) {
+  } else if (result == 1) {
     res.json({ status: 1 });
   } else {
     res.json({ status: -1 });
