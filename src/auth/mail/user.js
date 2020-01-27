@@ -89,7 +89,7 @@ module.exports = class user {
       },
       body: JSON.stringify({
         query: ` query MyQuery {
-          users(where: {email: {_eq: "zakaria.elhedadi@gmail.com"}}, limit: 1) {
+          users(where: {email: {_eq: "${email}}"}}, limit: 1) {
             active
           }
         }
@@ -98,7 +98,7 @@ module.exports = class user {
           `
       })
     });
-   
+
     const data = await response.json();
     if (data.data.users.length > 0) {
       return data.data.users[0].active;
