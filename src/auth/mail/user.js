@@ -82,7 +82,7 @@ module.exports = class user {
 
   static async getStatusUser(email) {
     console.log(` query MyQuery {
-      users(where: {email: {_eq: "${email}}"}}, limit: 1) {
+      users(where: {email: {_eq: "${email}"}}, limit: 1) {
         active
       }
     }
