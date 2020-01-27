@@ -285,7 +285,7 @@ function verifyToken(token) {
 async function main(email) {
   try {
     let id = await User.updateSecretTokenExpires(email);
-
+    console.log(id);
     let data = { id: id };
     let token = await signToken(data);
     let path = `https://auth.skiliks.net/auth/validateAccount?Br=${token}`;
@@ -303,7 +303,7 @@ async function main(email) {
       })
       .then(function(response) {
         // handle success
-        console.log(response.datap);
+        console.log(response.data);
       })
       .catch(function(error) {
         // handle error
@@ -333,7 +333,7 @@ router.get("/validateAccount", async (req, res, next) => {
       if (result != null) {
         res.redirect(redirect_url);
       } else {
-        console.log(result);
+        console.log(result.data);
         res.redirect(redirect_url);
       }
     } else {
