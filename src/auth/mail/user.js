@@ -12,7 +12,7 @@ module.exports = class user {
     let i = access_token_expires_mail;
     var date = new Date();
 
-    return new Date(date.getTime() + minutes * i);
+    return new Date(date.getTime() + i * 60000);
   }
 
   static async getSecretToken(id) {
