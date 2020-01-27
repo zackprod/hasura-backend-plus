@@ -315,10 +315,23 @@ async function main(email) {
 }
 
 router.post("/init-activate-account", async (req, res, next) => {
-  let email = req.body.email;
+  const schema = Joi.object().keys({
+    email: Joi.string()
+      .email()
+      .required()
+  });
 
-  main(email);
-  res.json({ status: 1 });
+  const { error, value } = schema.validate(req.body);
+
+  const { email } = value;
+
+  let result = await User.getStatusUser(email);
+  if (!result) {
+    main(email);
+    res.json({ status: 1 });
+  } else {
+    res.json({ status: 0 });
+  }
 });
 
 router.get("/validateAccount", async (req, res, next) => {

@@ -80,6 +80,33 @@ module.exports = class user {
     }
   }
 
+  static async getStatusUser(email) {
+    let response = await fetch(HASURA_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": HASURA_GRAPHQL_ADMIN_SECRET
+      },
+      body: JSON.stringify({
+        query: ` query MyQuery {
+          users(where: {email: {_eq: "zakaria.elhedadi@gmail.com"}}, limit: 1) {
+            active
+          }
+        }
+        
+          
+          `
+      })
+    });
+   
+    const data = await response.json();
+    if (data.data.users.length > 0) {
+      return data.data.users[0].active;
+    } else {
+      return -1;
+    }
+  }
+
   static async activateAccount(id) {
     try {
       let secret_token = await this.getSecretToken(id);
