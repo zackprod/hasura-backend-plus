@@ -373,7 +373,7 @@ router.post("/forgot-password", async (req, res, next) => {
 
   const { email } = value;
   let user = User.getStatusUser(email);
-  if (user == 1) {
+  if (user == true) {
     let uuid = await uidgen.generate();
     var response = User.insertCode_token_forgot_psw(email, uuid);
     console.log(response);
@@ -404,7 +404,7 @@ router.post("/forgot-password", async (req, res, next) => {
       return next(Boom.unauthorized("Probleme  forgot password process"));
     }
   } else {
-    console.log("user note found");
+    console.log("user not found");
     res.json({ status: 0 });
   }
 });
