@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const { graphql_client } = require("../graphql-client");
 const User = require("./mail/user");
 const axios = require("axios");
+const UIDGenerator = require("uid-generator");
+const uidgen = new UIDGenerator(); // Default is a 128-bit UID encoded in base58
 
 const {
   USER_FIELDS,
@@ -371,8 +373,8 @@ router.post("/forgot-password", async (req, res, next) => {
 
   const { email } = value;
   let user = User.getStatusUser(email);
-  if (user) {
-    let uuid = uuidv4();
+  if (user == 1) {
+    let uuid = await uidgen.generate();
     var response = User.insertCode_token_forgot_psw(email, uuid);
     console.log(response);
     if (response == 1) {

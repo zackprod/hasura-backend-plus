@@ -154,7 +154,6 @@ module.exports = class user {
         })
       });
       const data = await response.json();
-      console.log(data);
       if (data.data.update_users && data.data.update_users.affected_rows == 1) {
         return 1;
       } else {
