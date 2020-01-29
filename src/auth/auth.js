@@ -362,7 +362,7 @@ router.get("/validateAccount", async (req, res, next) => {
   }
 });
 
-router.post("/forgot-password", async (req, res, next) => {
+router.post("/reset-password", async (req, res, next) => {
   const schema = Joi.object().keys({
     email: Joi.string()
       .email()
