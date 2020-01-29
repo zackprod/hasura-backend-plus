@@ -176,15 +176,14 @@ module.exports = class user {
         body: JSON.stringify({
           query: `mutation MyMutation($email: String, $uuid: String, $date: timestamptz) {
             __typename
-            update_users(where: {email: {_eq: $email}, code_token_forgot_psw: {_eq: $uuid}, code_token_forgot_psw_expires_at: {_gt: "now()"}}, _set: {secret_token_expires_at: $date}) {
+            update_users(where: {email: {_eq: $email}, code_token_forgot_psw: {_eq: $uuid}, code_token_forgot_psw_expires_at: {_gt: "now()"}}, _set: {secret_token_expires_at: $date, code_token_forgot_psw_expires_at: "now()"}) {
               affected_rows
               returning {
                 secret_token
               }
             }
           }
-          
-            
+                      
           `,
           variables: {
             email: email,
