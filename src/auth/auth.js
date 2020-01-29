@@ -386,8 +386,8 @@ router.post("/forgot-password", async (req, res, next) => {
         password: password
       }
     );
-    var response = await data.json();
-    console.log(response);
+
+    console.log(data);
     res.json({ status: 1 });
   } else {
     res.json({ status: 0 });
