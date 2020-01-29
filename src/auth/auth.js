@@ -372,7 +372,8 @@ router.post("/forgot-password", async (req, res, next) => {
   const { error, value } = schema.validate(req.body);
 
   const { email } = value;
-  let user = User.getStatusUser(email);
+  let user = await User.getStatusUser(email);
+  console.log(user);
   if (user == true) {
     let uuid = await uidgen.generate();
     var response = User.insertCode_token_forgot_psw(email, uuid);
