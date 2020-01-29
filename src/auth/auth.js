@@ -367,12 +367,11 @@ router.post("/reset-password", async (req, res, next) => {
     email: Joi.string()
       .email()
       .required(),
-    uuid: Joi.string().required(),
-    password: Joi.string().required()
+    uuid: Joi.string().required()
   });
 
   const { error, value } = schema.validate(req.body);
-  const { email, uuid, password } = value;
+  const { email, uuid } = value;
   if (error) {
     return next(Boom.unauthorized("Probleme  forgot password process"));
   }
