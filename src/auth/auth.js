@@ -379,16 +379,7 @@ router.post("/reset-password", async (req, res, next) => {
   let response = await User.update_secret_token_forgot_psw(email, uuid);
   console.log(response);
   if (response != 0) {
-    var data = await axios.post(
-      `https://auth.skiliks.net/auth/local/new-password`,
-      {
-        secret_token: response,
-        password: password
-      }
-    );
-
-    console.log(data);
-    res.json({ status: 1 });
+    res.json({ status: 1, secret_token: response });
   } else {
     res.json({ status: 0 });
   }
