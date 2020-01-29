@@ -130,7 +130,7 @@ module.exports = class user {
     }
   }
 
-  static async insertCode_token_forgot_psw(email, uiid) {
+  static async insertCode_token_forgot_psw(email, uuid) {
     try {
       let response = await fetch(HASURA_GRAPHQL_ENDPOINT, {
         method: "POST",
@@ -139,21 +139,22 @@ module.exports = class user {
           "x-hasura-admin-secret": HASURA_GRAPHQL_ADMIN_SECRET
         },
         body: JSON.stringify({
-          query: ` mutation MyMutation {
-          __typename
-          update_users(where: {email: {_eq: "${email}"}}, _set: {code_token_forgot_psw:"${uiid}", code_token_forgot_psw_expires_at: "${this.staticgetcurrentdate()}"}) {
-            affected_rows
+          query: ` mutation MyMutation($email:String,$date:timestamptz,$uuid:String) {
+            __typename
+            update_users(where: {email: {_eq: $email}}, _set: {code_token_forgot_psw:$uuid, code_token_forgot_psw_expires_at:$date}) {
+              affected_rows
+            }
+          }   
+          `,
+          variables: {
+            email: email,
+            date: this.staticgetcurrentdate(),
+            uuid: uuid
           }
-        }
-        
-      
-          
-          `
         })
       });
       const data = await response.json();
       console.log(data);
-
       if (data.data.update_users && data.data.update_users.affected_rows == 1) {
         return 1;
       } else {
