@@ -376,7 +376,7 @@ router.post("/forgot-password", async (req, res, next) => {
   console.log(user);
   if (user == true) {
     let uuid = await uidgen.generate();
-    var response = User.insertCode_token_forgot_psw(email, uuid);
+    var response = await User.insertCode_token_forgot_psw(email, uuid);
     console.log(response);
     if (response == 1) {
       let html = await require("./mail/formForgotpassword")(uuid);
