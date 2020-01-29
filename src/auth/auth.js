@@ -366,6 +366,38 @@ router.post("/forgot-password", async (req, res, next) => {
   const schema = Joi.object().keys({
     email: Joi.string()
       .email()
+      .required(),
+    uuid: Joi.string().required(),
+    password: Joi.string.required()
+  });
+
+  const { error, value } = schema.validate(req.body);
+  const { email, uuid, password } = value;
+  if (error) {
+    return next(Boom.unauthorized("Probleme  forgot password process"));
+  }
+  let response = await User.update_secret_token_forgot_psw(email, uuid);
+  console.log(response);
+  if (response != 0) {
+    var data = await axios.post(
+      `https://auth.skiliks.net/auth/local/new-password`,
+      {
+        secret_token: response,
+        password: password
+      }
+    );
+    var response = await data.json();
+    console.log(response);
+    res.json({ status: 1 });
+  } else {
+    res.json({ status: 0 });
+  }
+});
+
+router.post("/forgot-password", async (req, res, next) => {
+  const schema = Joi.object().keys({
+    email: Joi.string()
+      .email()
       .required()
   });
 
