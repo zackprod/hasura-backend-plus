@@ -70,8 +70,7 @@ module.exports = class user {
         }
       })
     });
-    console.log(this.staticgetcurrentdate());
-    console.log(new Date());
+
     const data = await response.json();
     if (data.data.update_users.returning.length > 0) {
       return data.data.update_users.returning[0].id;
@@ -81,14 +80,6 @@ module.exports = class user {
   }
 
   static async getStatusUser(email) {
-    console.log(` query MyQuery {
-      users(where: {email: {_eq: "${email}"}}, limit: 1) {
-        active
-      }
-    }
-    
-      
-      `);
     let response = await fetch(HASURA_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
@@ -108,8 +99,7 @@ module.exports = class user {
     });
 
     var data = await response.json();
-    console.log(data.data.users);
-    console.log(data.data.users.length);
+
     if (data.data.users.length > 0) {
       return data.data.users[0].active;
     } else {
@@ -137,6 +127,35 @@ module.exports = class user {
       console.log(error);
 
       return null;
+    }
+  }
+
+  static async insertCode_token_forgot_psw(email, uiid) {
+    let response = await fetch(HASURA_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": HASURA_GRAPHQL_ADMIN_SECRET
+      },
+      body: JSON.stringify({
+        query: ` mutation MyMutation {
+          __typename
+          update_users(where: {email: {_eq: "${email}"}}, _set: {code_token_forgot_psw:${uuid}, code_token_forgot_psw_expires_at: "${this.staticgetcurrentdate()}"}) {
+            affected_rows
+          }
+        }
+        
+      
+          
+          `
+      })
+    });
+
+    const data = await response.json();
+    if (data.data.update_users && data.data.update_users.affected_rows == 1) {
+      return 1;
+    } else {
+      return 0;
     }
   }
 };

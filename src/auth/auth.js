@@ -285,7 +285,6 @@ function verifyToken(token) {
 async function main(email) {
   try {
     let id = await User.updateSecretTokenExpires(email);
-    console.log(id);
     let data = { id: id };
     let token = await signToken(data);
     let path = `https://auth.skiliks.net/auth/validateAccount?Br=${token}`;
@@ -358,6 +357,52 @@ router.get("/validateAccount", async (req, res, next) => {
   } catch (error) {
     console.log(error);
     res.status(404).send("405 Invalid Request");
+  }
+});
+
+router.get("/forgot-password", async (req, res, next) => {
+  const schema = Joi.object().keys({
+    email: Joi.string()
+      .email()
+      .required()
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  const { email } = value;
+  let user = User.getStatusUser(email);
+  if (user) {
+    let uuid = uuidv4();
+    var response = User.insertCode_token_forgot_psw(email, uuid);
+    if (response) {
+      let html = await require("./mail/formForgotpassword")(uuid);
+      const msg = {
+        to: email,
+        from: FromEmail,
+        subject: "Skiliks Forgot Password",
+        text: "Welcome",
+        html: html
+      };
+      axios
+        .post("http://68.183.67.65:5551/mailing", {
+          msg: msg
+        })
+        .then(function(response) {
+          // handle success
+          console.log(response.data);
+        })
+        .catch(function(error) {
+          // handle error
+          console.log(error);
+        });
+      res.json({ status: 1 });
+    } else {
+      console.log("insertCode_token_forgot_psw Probleme");
+      return next(Boom.unauthorized("Probleme  forgot password process"));
+    }
+  } else {
+    console.log("user note found");
+    res.json({ status: 0 });
   }
 });
 
