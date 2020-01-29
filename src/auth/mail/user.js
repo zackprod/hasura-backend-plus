@@ -159,6 +159,7 @@ module.exports = class user {
         return 0;
       }
     } catch (error) {
+      console.log(error);
       return 0;
     }
   }
