@@ -368,7 +368,7 @@ router.post("/reset-password", async (req, res, next) => {
       .email()
       .required(),
     uuid: Joi.string().required(),
-    password: Joi.string.required()
+    password: Joi.string().required()
   });
 
   const { error, value } = schema.validate(req.body);
