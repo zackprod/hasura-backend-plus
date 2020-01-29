@@ -141,7 +141,7 @@ module.exports = class user {
         body: JSON.stringify({
           query: ` mutation MyMutation {
           __typename
-          update_users(where: {email: {_eq: "${email}"}}, _set: {code_token_forgot_psw:${uiid}, code_token_forgot_psw_expires_at: "${this.staticgetcurrentdate()}"}) {
+          update_users(where: {email: {_eq: "${email}"}}, _set: {code_token_forgot_psw:"${uiid}", code_token_forgot_psw_expires_at: "${this.staticgetcurrentdate()}"}) {
             affected_rows
           }
         }
@@ -151,8 +151,9 @@ module.exports = class user {
           `
         })
       });
-
       const data = await response.json();
+      console.log(data);
+
       if (data.data.update_users && data.data.update_users.affected_rows == 1) {
         return 1;
       } else {
