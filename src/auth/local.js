@@ -331,7 +331,8 @@ router.post("/login", async (req, res, next) => {
   // return jwt token and refresh token to client
   res.json({
     refresh_token,
-    jwt_token
+    jwt_token,
+    JWT_TOKEN_EXPIRES
   });
 });
 
