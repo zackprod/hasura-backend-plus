@@ -153,7 +153,8 @@ router.post("/refresh-token", async (req, res, next) => {
 
   res.json({
     refresh_token: new_refresh_token,
-    jwt_token
+    jwt_token,
+    JWT_TOKEN_EXPIRES
   });
 });
 
