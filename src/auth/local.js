@@ -327,12 +327,14 @@ router.post("/login", async (req, res, next) => {
       Boom.badImplementation("Could not update 'refresh token' for user")
     );
   }
+  var decoded = jwt.decode(jwt_token, { complete: true });
+  let jwt_token_expires = decoded.payload.exp;
 
   // return jwt token and refresh token to client
   res.json({
     refresh_token,
     jwt_token,
-    JWT_TOKEN_EXPIRES
+    jwt_token_expires
   });
 });
 

@@ -151,10 +151,13 @@ router.post("/refresh-token", async (req, res, next) => {
   // generate new jwt token
   const jwt_token = auth_functions.generateJwtToken(user);
 
+  var decoded = jwt.decode(jwt_token, { complete: true });
+  let jwt_token_expires = decoded.payload.exp;
+
   res.json({
     refresh_token: new_refresh_token,
     jwt_token,
-    JWT_TOKEN_EXPIRES
+    jwt_token_expires
   });
 });
 
