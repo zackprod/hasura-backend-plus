@@ -303,6 +303,7 @@ async function main(email) {
       text: "Welcome",
       html: html
     };
+    console.log(API_MAILING);
     axios
       .post(API_MAILING, {
         msg: msg
@@ -313,7 +314,7 @@ async function main(email) {
       })
       .catch(function(error) {
         // handle error
-        console.log(error);
+        console.log("Erreur");
       });
   } catch (error) {
     console.log(error);

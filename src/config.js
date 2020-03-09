@@ -83,5 +83,4 @@ exports.FromEmail = process.env.FromEmail || "";
 exports.access_token_expires_mail = process.env.access_token_expires_mail || "";
 exports.redirect_url = process.env.redirect_url || "";
 exports.subject = process.env.subject || "";
-exports.API_MAILING =
-  process.env.API_MAILING || "http://localhost:5551/mailing";
+exports.API_MAILING =process.env.API_MAILING || "http://localhost:5551/mailing";
