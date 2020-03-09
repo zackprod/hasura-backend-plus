@@ -20,7 +20,8 @@ const {
   redirect_url,
   FromEmail,
   subject,
-  access_token_expires_mail
+  access_token_expires_mail,
+  API_MAILING
 } = require("../config");
 
 const auth_functions = require("./auth-functions");
@@ -303,7 +304,7 @@ async function main(email) {
       html: html
     };
     axios
-      .post("http://68.183.67.65:5551/mailing", {
+      .post(API_MAILING, {
         msg: msg
       })
       .then(function(response) {
@@ -414,7 +415,7 @@ router.post("/forgot-password", async (req, res, next) => {
         html: html
       };
       axios
-        .post("http://68.183.67.65:5551/mailing", {
+        .post(API_MAILING, {
           msg: msg
         })
         .then(function(response) {
